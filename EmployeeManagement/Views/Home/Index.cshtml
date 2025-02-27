@@ -1,0 +1,302 @@
+﻿@model List<EmployeeManagement.Models.Employee>
+@{
+    ViewBag.Title = "Employee Management";
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("form").submit(function () {
+            if ($("#EmpName").val() == "") {
+                alert("Please enter Name");
+                return false;
+            }
+            if ($("#Salary").val() == "" || isNaN($("#Salary").val())) {
+                alert("Please enter a valid Salary");
+                return false;
+            }
+            return true;
+        });
+
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+        var table = document.getElementById("employeeTable");
+        table.addEventListener("click", function (event) {
+            if (event.target.classList.contains("clickable")) {
+                document.getElementById("addemployee").style.display = "block";
+                var row = event.target.parentNode;
+                document.getElementById("ID").value = row.cells[0].innerText;
+                document.getElementById("EmpName").value = row.cells[1].innerText;
+                document.getElementById("Designation").value = row.cells[2].innerText;
+                document.getElementById("DateOfJoin").value = row.cells[3].innerText;
+                document.getElementById("Salary").value = row.cells[4].innerText;
+                document.querySelector(`input[name="Gender"][value="${row.cells[5].innerText}"]`).checked = true;
+            }
+        });
+    });
+   
+    function closeModal() {
+        document.getElementById("addemployee").style.display = "none";
+    }
+    function openpop() {
+        document.getElementById("addemployee").style.display = "block";
+    }
+
+    //$(document).ready(function () {
+    //    $.ajax({
+    //        url: '/Home/GetStates', // This should match your ASP.NET MVC route
+    //        type: 'GET',
+    //        dataType: 'json',
+    //        success: function (data) {
+    //            var dropdown = $('#stateDropdown');
+    //            dropdown.empty().append('<option value="">-- Select State --</option>');
+
+    //            $.each(data, function (index, state) {
+    //                dropdown.append('<option value="' + state.StateID + '">' + state.StateName + '</option>');
+    //            });
+    //        },
+    //        error: function () {
+    //            alert('Error loading states.');
+    //        }
+    //    });
+  //  });
+</script>
+@*<h2>Employee Details</h2>*@
+
+<form method="post" id="addemployee" @*class="modal"*@ action="@Url.Action("Create", "Home")" style="display:none">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div @*class="modal-header"*@>
+                    <button class="close" onclick="closeModal()">&times;</button>
+                    <h4 class="modal-title" id="title">Employee Details</h4>
+                </div>
+                <div>
+                    <input type="hidden" id="ID" name="Id" />
+                </div>
+                <div>
+                    <label class="control-label" for="EmpName">Name:<span class="required">*</span></label>
+                    <input class="from-control" type="text" placeholder="Name"  required="required" name="Name" id="EmpName" />
+                </div>
+                <div>
+                    <label class="control-label" for="Designation">Designation:<span class="required">*</span></label>
+                    <input class="from-control" type="text" placeholder="Designation" name="Designation" required="required" id="Designation" />
+                </div>
+                <div>
+                    <label class="control-label" for="DateOfJoin">DateOfJoin:<span class="required">*</span></label>
+                    <input type="date" class="from-control" name="DateOfJoin" required="required" id="DateOfJoin" />
+                </div>
+                <div>
+                    <label class="control-label" for="Salary">Salary:<span class="required">*</span></label>
+                    <input type="number" class="from-control" name="Salary" required="required" id="Salary" />
+                </div>
+                <div>
+                    <label class="control-label" for="Gender">Gender:<span class="required">*</span></label>
+                    <input type="radio" class="from-control" name="Gender" id="Male" value="M" required /> Male
+                    <input type="radio" class="from-control" name="Gender" id="female" value="F" required /> Female
+                </div>
+                <div>
+                    <label class="control-label" for="State">State:<span class="required">*</span></label>
+                    <div>
+                        <select class="from-control" name="State" required>
+                            <option value="Texas">Texas</option>
+                            <option value="California">California</option>
+                            <option value="Florida">Florida</option>
+                            <option value="New York">New York</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <div colspan="2">
+                        <button type="submit">Save</button>
+                    </div>
+                </div>
+                @*<table>
+                        <tr>
+                            <td>Name:</td>
+                            <td><input type="text" name="Name" id="txtName" required /></td>
+                        </tr>
+                        <tr>
+                            <td>Designation:</td>
+                            <td><input type="text" name="Designation" id="txtDesignation" required /></td>
+                        </tr>
+                        <tr>
+                            <td>Date of Join:</td>
+                            <td><input type="date" name="DateOfJoin" id="txtDOJ" required /></td>
+                        </tr>
+                        <tr>
+                            <td>Salary:</td>
+                            <td><input type="number" name="Salary" id="txtSalary" required /></td>
+                        </tr>
+                        <tr>
+                            <td>Gender:</td>
+                            <td>
+                                <input type="radio" name="Gender" id="Male" value="M" required /> Male
+                                <input type="radio" name="Gender" id="female" value="F" required /> Female
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>State:</td>
+                            <td>
+                                <select name="State" required>
+                                    <option value="Texas">Texas</option>
+                                    <option value="California">California</option>
+                                    <option value="Florida">Florida</option>
+                                    <option value="New York">New York</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <button type="submit">Save</button>
+                            </td>
+                        </tr>
+                    </table>*@
+            </div>
+        </div>
+    </div>
+</form>
+<div class="alginright">
+    <button  type="button" onclick="openpop()" class="btn btn-success" @*data-toggle="modal" data-target=".addemployee"*@>
+        New Employee
+    </button>
+</div>
+
+<h3>Employee List</h3>
+<table border="1"
+       id="employeeTable" class="table table-striped table-bordered nowrap hidden-sm hidden-xs" cellspacing="0" style="width:100%; min-width:320px;">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Designation</th>
+        <th>Date of Join</th>
+        <th>Salary</th>
+        <th>Gender</th>
+        <th>State</th>
+        <th>Actions</th>
+    </tr>
+    @foreach (var emp in Model)
+    {
+        <tr>
+            <td>@emp.Id</td>
+            <td class="clickable" style="cursor: pointer; color: blue;">
+                @emp.Name
+            </td>
+            <td>@emp.Designation</td>
+            <td>@emp.DateOfJoin.ToString("yyyy-MM-dd")</td>
+            <td>@emp.Salary</td>
+            <td>@emp.Gender</td>
+            <td>@emp.State</td>
+            <td>
+                <a href="@Url.Action("Delete", "Home", new { id = emp.Id })" onclick="return confirm('Are you sure?')">Delete</a>
+            </td>
+        </tr>
+    }
+</table>
+
+<style>
+    table.dataTable th.focus,
+    table.dataTable td.focus {
+        outline: 2px solid #1ABB9C !important;
+        outline-offset: -1px;
+    }
+
+    table.display {
+        margin: 0 auto;
+        clear: both;
+        width: 100%;
+    }
+
+    table thead {
+        background-color: #101010;
+        color: #fff;
+    }
+
+    .table-striped > tbody > tr:nth-of-type(odd) {
+        background-color: #fff;
+    }
+
+    .table-striped > tbody > tr:nth-of-type(even) {
+        background-color: rgba(32,151,212,0.16);
+    }
+
+    table.display thead th {
+        padding: 8px 18px 8px 10px;
+        border-bottom: 1px solid black;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    table.display tfoot th {
+        padding: 3px 18px 3px 10px;
+        border-top: 1px solid black;
+        font-weight: bold;
+    }
+
+    table.display tr.heading2 td {
+        border-bottom: 1px solid #aaa;
+    }
+
+    table.display td {
+        padding: 3px 10px;
+    }
+
+        table.display td.center {
+            text-align: center;
+        }
+
+    table.display thead th:active,
+    table.display thead td:active {
+        outline: none;
+    }
+
+    .alginright {
+        float: right;
+        margin-left: 15px;
+    }
+
+    .btn-success {
+        border: 1px solid #1ABB9C
+    }
+
+    .required {
+        color: red;
+    }
+
+    .control-label {
+        padding-top: 10px;
+    }
+    /*.from-control{
+        border-radius:0;
+        width:100%;
+        margin-right:0;
+        margin-left:0;
+        box-shadow:none !important;
+        border-color:#CCD0D7;
+    }*/
+    .modal-content {
+        width: 50%;
+    }
+    .modal-header .close {
+        float: right !important;
+        /*margin-right: -30px !important;    margin-top: -30px !important;*/
+        margin-bottom: -3px;
+        background-color: white !important;
+        border-radius: 15px !important;
+        width: 30px !important;
+        height: 30px !important;
+        opacity: 1 !important;
+    }
+    .modal-header {
+        color: #fff;
+        padding: 15px;
+        border-bottom: 1px solid #101010;
+        margin-bottom: -3px;
+        background-color: black;
+        -webkit-border-top-left-radius: 5px;
+        -webkit-border-top-right-radius: 5px;
+        -moz-border-radius-topleft: 5px;
+        -moz-border-radius-topright: 5px;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+</style>
