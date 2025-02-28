@@ -2,6 +2,7 @@
 @{
     ViewBag.Title = "Employee Management";
 }
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
@@ -30,10 +31,15 @@
                 document.getElementById("DateOfJoin").value = row.cells[3].innerText;
                 document.getElementById("Salary").value = row.cells[4].innerText;
                 document.querySelector(`input[name="Gender"][value="${row.cells[5].innerText}"]`).checked = true;
+                let stateValue = row.cells[6].innerText.trim();
+                let stateDropdown = document.getElementById("State");
+                if (stateDropdown) {
+                    stateDropdown.value = stateValue; // Set the selected state
+                }
             }
         });
     });
-   
+
     function closeModal() {
         document.getElementById("addemployee").style.display = "none";
     }
@@ -41,24 +47,70 @@
         document.getElementById("addemployee").style.display = "block";
     }
 
-    //$(document).ready(function () {
-    //    $.ajax({
-    //        url: '/Home/GetStates', // This should match your ASP.NET MVC route
-    //        type: 'GET',
-    //        dataType: 'json',
-    //        success: function (data) {
-    //            var dropdown = $('#stateDropdown');
-    //            dropdown.empty().append('<option value="">-- Select State --</option>');
+    function sendGetRequest() {
+        let param1 = document.getElementById("employees").value;
+        let param2 = document.getElementById("Data").value;
 
-    //            $.each(data, function (index, state) {
-    //                dropdown.append('<option value="' + state.StateID + '">' + state.StateName + '</option>');
-    //            });
-    //        },
-    //        error: function () {
-    //            alert('Error loading states.');
-    //        }
-    //    });
-  //  });
+        // Append parameters to the URL
+        let url = `/Report/GenerateReport?reportType=${encodeURIComponent(param1)}&Data=${encodeURIComponent(param2)}`;
+
+        fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/ pdf"
+            }
+        })
+            //.then(response => response.json()) // Convert response to JSON
+            //.then(data => console.log("Response:", data))
+            //.catch(error => console.error("Error:", error));
+            .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to download report.");
+            }
+                return response.blob();
+                console.log(response.blob())
+
+        })
+        .then(blob => {
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "Employee.pdf"// Set the filename
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        })
+        .catch(error => console.error("Error:", error));
+
+
+    }
+
+    function calculateSubtotal() {
+        let total = 0;
+
+        // Select all elements with class 'salary'
+        let salaryCells = document.querySelectorAll(".salary");
+
+        salaryCells.forEach(function (td) {
+            let salaryText = td.textContent.trim(); // Get text inside the cell
+            let salary = parseFloat(salaryText.replace(/,/g, '')); // Remove commas and convert to number
+
+            if (!isNaN(salary)) { // Check if it's a valid number
+                total += salary;
+            }
+        });
+
+        // Update the subtotal <td> element
+        let subtotalElement = document.getElementById("subtotal");
+
+        if (subtotalElement) { // Check if element exists
+            subtotalElement.textContent = total.toFixed(2); // Set total with 2 decimal places
+        } else {
+            console.error("Subtotal element not found!");
+        }
+    }
+
+    // Call function on page load
+    document.addEventListener("DOMContentLoaded", calculateSubtotal);
 </script>
 @*<h2>Employee Details</h2>*@
 
@@ -75,7 +127,7 @@
                 </div>
                 <div>
                     <label class="control-label" for="EmpName">Name:<span class="required">*</span></label>
-                    <input class="from-control" type="text" placeholder="Name"  required="required" name="Name" id="EmpName" />
+                    <input class="from-control" type="text" placeholder="Name" required="required" name="Name" id="EmpName" />
                 </div>
                 <div>
                     <label class="control-label" for="Designation">Designation:<span class="required">*</span></label>
@@ -97,66 +149,32 @@
                 <div>
                     <label class="control-label" for="State">State:<span class="required">*</span></label>
                     <div>
-                        <select class="from-control" name="State" required>
-                            <option value="Texas">Texas</option>
-                            <option value="California">California</option>
-                            <option value="Florida">Florida</option>
-                            <option value="New York">New York</option>
+                        <select class="from-control" id="State" name="State" required>
+                            <option value="Andhra Pradesh">Andhra Pradesh</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Telangana">Telangana</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Kerala">Kerala</option>
+                            <option value="Kerala">Kerala</option>
+                            <option value="Rajasthan">Rajasthan</option>
                         </select>
                     </div>
-                </div>
+                </div><br />
                 <div>
-                    <div colspan="2">
-                        <button type="submit">Save</button>
+                    <div colspan="4">
+                        <button type="submit" class="btn btn-success">Save</button>
                     </div>
-                </div>
-                @*<table>
-                        <tr>
-                            <td>Name:</td>
-                            <td><input type="text" name="Name" id="txtName" required /></td>
-                        </tr>
-                        <tr>
-                            <td>Designation:</td>
-                            <td><input type="text" name="Designation" id="txtDesignation" required /></td>
-                        </tr>
-                        <tr>
-                            <td>Date of Join:</td>
-                            <td><input type="date" name="DateOfJoin" id="txtDOJ" required /></td>
-                        </tr>
-                        <tr>
-                            <td>Salary:</td>
-                            <td><input type="number" name="Salary" id="txtSalary" required /></td>
-                        </tr>
-                        <tr>
-                            <td>Gender:</td>
-                            <td>
-                                <input type="radio" name="Gender" id="Male" value="M" required /> Male
-                                <input type="radio" name="Gender" id="female" value="F" required /> Female
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>State:</td>
-                            <td>
-                                <select name="State" required>
-                                    <option value="Texas">Texas</option>
-                                    <option value="California">California</option>
-                                    <option value="Florida">Florida</option>
-                                    <option value="New York">New York</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                <button type="submit">Save</button>
-                            </td>
-                        </tr>
-                    </table>*@
+                </div>             
             </div>
         </div>
     </div>
 </form>
 <div class="alginright">
-    <button  type="button" onclick="openpop()" class="btn btn-success" @*data-toggle="modal" data-target=".addemployee"*@>
+    <button type="button" onclick="openpop()" class="btn btn-success" @*data-toggle="modal" data-target=".addemployee"*@>
         New Employee
     </button>
 </div>
@@ -183,15 +201,45 @@
             </td>
             <td>@emp.Designation</td>
             <td>@emp.DateOfJoin.ToString("yyyy-MM-dd")</td>
-            <td>@emp.Salary</td>
+            <td class="salary">@emp.Salary</td>
             <td>@emp.Gender</td>
             <td>@emp.State</td>
             <td>
                 <a href="@Url.Action("Delete", "Home", new { id = emp.Id })" onclick="return confirm('Are you sure?')">Delete</a>
             </td>
         </tr>
+
     }
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <th>Total</th>
+        <th id="subtotal"><strong>0</strong></th> <!-- Make sure this exists -->
+    </tr>
 </table>
+
+<div>
+    <label class="control-label" for="GenerateReport">Generate Report</label>
+    <div>
+        <select class="from-control" name="employee" id="employees" required>
+            <option value="">Select the Report</option>
+            <option value="Employee-wise">Employee-wise</option>
+            @*<option value="Employee">Employee</option>*@
+        <option value="Designation ">Designation </option>
+            <option value="Combination">Combination</option>
+            <option value="Hierarchy">Hierarchy</option>
+        </select>
+    </div>
+</div>
+<br />
+<div>
+    <input type="text" placeholder="Enter the Data" id="Data" name="Data"/>
+</div>
+<br />
+<button type="button" onclick="sendGetRequest()" class="btn btn-success">
+    Generate Report
+</button>
 
 <style>
     table.dataTable th.focus,
@@ -276,9 +324,11 @@
     .modal-content {
         width: 50%;
     }
+
     .modal-header .close {
         float: right !important;
-        /*margin-right: -30px !important;    margin-top: -30px !important;*/
+        /*margin-right: -30px !important;
+    margin-top: -30px !important;*/
         margin-bottom: -3px;
         background-color: white !important;
         border-radius: 15px !important;
@@ -286,6 +336,7 @@
         height: 30px !important;
         opacity: 1 !important;
     }
+
     .modal-header {
         color: #fff;
         padding: 15px;
